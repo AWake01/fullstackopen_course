@@ -1,0 +1,32 @@
+```mermaid
+sequenceDiagram
+    participant browser
+    participant server
+
+    Note over browser,server: Page load
+
+    browser->>server: GET ttps://studies.cs.helsinki.fi/exampleapp/main.html
+    activate server
+    server-->>browser: 201 created
+    deactivate server
+
+    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/main.css
+    activate server
+    server-->>browser: the css file
+    deactivate server
+
+    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/main.js
+    activate server
+    server-->>browser: the JavaScript file
+    deactivate server
+
+    Note over browser,server: 'New Note' button pressed 
+
+    browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa <br/> formData(JSON)
+
+    activate server
+    server-->>browser: 201 created
+    deactivate server
+
+    Note over browser,server: main.js updates view with new note
+```
