@@ -1,75 +1,44 @@
 import { useState } from 'react'
 
-function App() {
-  const [good, setGood] = useState(0)
-  const [neutral, setNeutral] = useState(0)
-  const [bad, setBad] = useState(0)
-  const [total, setTotal] = useState(0)
-  const [average, setAverage] = useState(0)
-  const [positive, setPositive] = useState(0)
+const App = () => {
+  const anecdotes = [
+    'If it hurts, do it more often.',
+    'Adding manpower to a late software project makes it later!',
+    'The first 90 percent of the code accounts for the first 90 percent of the development time...The remaining 10 percent of the code accounts for the other 90 percent of the development time.',
+    'Any fool can write code that a computer can understand. Good programmers write code that humans can understand.',
+    'Premature optimization is the root of all evil.',
+    'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.',
+    'Programming without an extremely heavy use of console.log is same as if a doctor would refuse to use x-rays or blood tests when diagnosing patients.',
+    'The only way to go fast, is to go well.'
+  ]
 
-  const goodClick = () => {
-    const newGood = good + 1
-    const newTotal = total + 1
-    setGood(newGood)
-    setTotal(newTotal)
-    calcStats(newGood, bad, newTotal)
-  }
-  const neutralClick = () => {
-    const newNeutral = neutral + 1
-    const newTotal = total + 1
-    setNeutral(newNeutral)
-    setTotal(newTotal)
-    calcStats(good, bad, newTotal)
-  }
-  const badClick = () => {
-    const newBad = bad + 1
-    const newTotal = total + 1
-    setBad(newBad)
-    setTotal(newTotal)
-    calcStats(good, newBad, newTotal)
+  //const anecdoteVotes = new Uint8Array(8)
+   
+  const [selected, setSelected] = useState(0)
+  const [vote, setVote] = useState(new Uint8Array(8))
+
+  const quoteButtonClick = () => {
+    const index = Math.floor(Math.random() * anecdotes.length);
+    setSelected(index)
   }
 
-  const calcTotal = () => {
-    const newTotal = good + neutral + bad
-    setTotal(newTotal)
+  const voteButtonClick = () => {
+    const copy = [...vote]
+    copy[selected] += 1
+    setVote(copy)
+    console.log(anecdotes[vote.indexOf(Math.max(...vote))])
   }
-   const calcAverage = () => {
-    const newAverage = (good*1 + neutral*0 + bad*-1)/3
-    setAverage(newAverage)
-  }
-
-  const calcStats = (curGood, curBad, curTotal) => {
-
-    const newAverage = (curGood - curBad)/curTotal
-    const newPositive = (curGood/curTotal)*100
-    console.log(curTotal,newAverage, newPositive)
-    setAverage(newAverage)
-    setPositive(newPositive)
-  }
-
- //const calcAverage = () => {return (good*1 + neutral*0 + bad*-1)/3}
- //const calcPositivePercent = () => {return (total/100 * good)}
 
   return (
     <div>
-      <Header title="Give feedback"/>
-      <Button onClick={goodClick} text="good"/>
-      <Button onClick={neutralClick} text="neutral"/>
-      <Button onClick={badClick} text="bad"/>
-      <Header title="Statistics"/>
-      <Statistics good={good} neutral={neutral} bad={bad} total={total} average={average} positive={positive}/>
-      {/* <Display text="good" value={good}/>
-      <Display text="neutral" value={neutral}/>
-      <Display text="bad" value={bad}/> */}
-      {/* <Display text="all" value={total}/> */}
+      <Header text="Anecdote of the day"/>
+      <Anecdote anecdote={anecdotes[selected]}/>
+      <DisplayVote vote={vote[selected]}/>
+      <Button onClick={voteButtonClick} text="vote"/>
+      <Button onClick={quoteButtonClick} text="next anecdote"/>
+      <Header text="Anecdote with the most votes"/>
+      <AnecdoteMostVotes anecdotes={anecdotes} votes={vote}/>
     </div>
-  )
-}
-
-const Header = ({title}) => {
-  return (
-    <h1>{title}</h1>
   )
 }
 
@@ -79,41 +48,34 @@ const Button = ({onClick, text}) => {
   )
 }
 
-const Display = ({text, value}) => {
+const DisplayVote = ({vote}) => {
   return (
-    <p>{text} {value}</p>
+    <p>has {vote} votes</p>
   )
 }
 
-const Statistics = ({good, neutral, bad, total, average, positive}) => {
-
-      /* <Statistic text={text[0]} value={value[0]} unit={unit[0]}/>
-      <Statistic text={text[1]} value={value[1]} unit={unit[1]}/>
-      <Statistic text={text[2]} value={value[2]} unit={unit[2]}/> */
-      if(total > 0) {
-        return (
-          <div>
-            <table>
-              <StatisticLine text="good" value={good}/>
-              <StatisticLine text="neutral" value={neutral}/>
-              <StatisticLine text="bad" value={bad}/>
-              <StatisticLine text="total" value={total}/>
-              <StatisticLine text="average" value={average}/>
-              <StatisticLine text="positive" value={positive} unit="%"/>
-            </table>
-          </div>
-        )
-      }
-      else { return(<Display text="No feedback given"/>) }
+const Header = ({text}) => {
+  return (
+    <h1>{text}</h1>
+  )
 }
 
-const StatisticLine = ({text, value, unit}) => {
-  return (
-    <tr>
-      <td>{text}</td>
-      <td>{value} {unit}</td>
-    </tr>
-    // <p>{text} {value} {unit}</p>
+const Anecdote = ({anecdote}) => {
+  return(
+    <p>{anecdote}</p>
+  )
+}
+
+const AnecdoteMostVotes = ({anecdotes, votes}) => {
+  const mostVotesIndex = votes.indexOf(Math.max(...votes))
+  const mostVotes = votes[mostVotesIndex]
+  const anecdote = anecdotes[mostVotesIndex]
+
+  return(
+    <div>
+      <p>{anecdote}</p>
+      <DisplayVote vote={mostVotes}/>
+    </div>
   )
 }
 
