@@ -1,4 +1,5 @@
 import { useState } from "react"
+import Course from './components/Course'
 
 const App = () => {
   const courses = [
@@ -46,51 +47,11 @@ const App = () => {
     }
   ]
 
-
-  const [total, setTotal] = useState(0)
-
   return (
     <div>
       {/* <Course course={course}/>  */}
       {courses.map(course => <Course key={course.id} course={course}></Course>)}
     </div>
-  )
-}
-
-const Course = ({course}) => {
-  const calcTotal = ({course}) => {
-    const content = course.parts
-    const newTotal = content.reduce((acc, part) => acc + part.exercises, 0)
-    console.log(newTotal)
-    return newTotal
-  }
-
-  return (
-    <div>
-      <h1>{course.name}</h1>
-      <Content content={course.parts}/>
-      <Total total={calcTotal({course})}/>
-    </div>
-  )
-}
-
-const Content = ({content}) => {
-  return (
-    <div>
-      {content.map(part => <Part key={part.id} name={part.name} exercises={part.exercises}></Part>)}
-    </div>
-  )
-}
-
-const Part = ({id, name, exercises}) => {
-  return (
-    <p>{name} {exercises}</p>
-  )
-}
-
-const Total = ({total}) => {
-  return (
-    <h4>total of {total} exercises</h4>
   )
 }
 
