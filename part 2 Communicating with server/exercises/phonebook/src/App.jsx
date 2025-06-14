@@ -9,7 +9,8 @@ const App = () => {
   ]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
-  const [filteredPersons, setFilteredPersons] = useState([])
+  const [searchValue, setSearchValue] = useState('')
+  const [showAll, setShowAll] = useState(true)
 
   const addClick = (event) => {
     event.preventDefault()
@@ -18,14 +19,16 @@ const App = () => {
 
     if(persons.find(person => person.name === newPerson.name)) { 
       alert(`${newName} is already added to phonebook`)
-      return
     }
-
-    setPersons(persons.concat(newPerson))
+    else{ 
+      alert(`added ${newName} ${newNumber} to phonebook`)
+      setPersons(persons.concat(newPerson))
+      //setSearchValue('')
+    }
   }
 
   const handleNameChange = (event) => {
-    const newName = event.target.values
+    const newName = event.target.value
     setNewName(newName)
   }
 
@@ -34,24 +37,30 @@ const App = () => {
     setNewNumber(newNumber)
   }
 
-   const handleSearchChange = (event) => {
-    setFilteredPersons(persons.filter(person => person.name.toLowerCase().includes(event.target.value.toLowerCase())))  //Case sensitvie
+  //Show all numbers if search box is empty
+  const handleSearchChange = (event) => {
+    setSearchValue(event.target.value)
+    if(searchValue === '') {
+      setShowAll(true)
+      return
+    }
+    else{
+      setShowAll(false)
+    }
   }
+
+  const filterPersons = showAll
+  ? persons
+  : persons.filter(person => person.name.toLowerCase().includes(searchValue.toLowerCase()))  //Case insensitivie
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>name: <input onChange={handleSearchChange}/></div>
+      <Filter onChange={handleSearchChange} value={searchValue}></Filter>
       <h2>Add a new</h2>
-      <form onSubmit={addClick}>
-        <div>name: <input onChange={handleNameChange}/></div>
-        <div>number: <input onChange={handleNumberChange}/></div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <PersonForm onClick={addClick} handleName={handleNameChange} handleNumber={handleNumberChange}></PersonForm>
       <h2>Numbers</h2>
-      {filteredPersons.map(person => <Number key={person.name} name={person.name} number={person.number}/>)} 
+      <Numbers people={filterPersons}></Numbers>
     </div>
   )
 }
@@ -61,5 +70,32 @@ const Number = ({name, number}) => {
     <p>{name} {number}</p>
   )
 }
+
+const Filter = ({onChange, value}) => {
+  return (
+    <div>filter shown with: <input onChange={onChange} value={value} placeholder=''/></div>
+  )
+}
+
+const PersonForm = ({onClick, handleName, handleNumber}) => {
+  return (
+    <div>
+      <form onSubmit={onClick}>
+          <div>name: <input onChange={handleName}/></div>
+          <div>number: <input onChange={handleNumber}/></div>
+          <div>
+            <button type="submit">add</button>
+          </div>
+      </form>
+    </div>
+  )
+}
+
+const Numbers = ({people}) => {
+  return (
+    <div>{people.map(person => <Number key={person.name} name={person.name} number={person.number}/>)} </div>
+  )
+}
+
 
 export default App
