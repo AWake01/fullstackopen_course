@@ -18,8 +18,8 @@ const App = () => {
   useEffect(() => {
     personsService
       .getAll()
-      .then(response => {
-        setPersons(response.data)
+      .then(initalPersons => {
+        setPersons(initalPersons)
       })
   }, [])
 
@@ -37,23 +37,26 @@ const App = () => {
 
       personsService
         .createPerson(newPerson)
-        .then(response => {
-          console.log(response.data)
-          setPersons(persons.concat(response.data))
+        .then(personToAdd => {
+          console.log(personToAdd)
+          setPersons(persons.concat(personToAdd))
         })
 
       setSearchValue('')
     }
   }
 
-  const deleteClick = (id) => {
+  const deleteClick = (name, id) => {
     console.log('delete ', id)
-     personsService
-        .deletePerson(id)
-        .then(response => {
-          console.log(response.data)
-          setPersons(persons.filter((person) => person.id !== id))
-        })
+    if(window.confirm(`Delete ${name} ?`))
+    {
+      personsService
+          .deletePerson(id)
+          .then(personToDelete => {
+            console.log(personToDelete)
+            setPersons(persons.filter((person) => person.id !== id))
+          })
+    }
   }
 
   const handleNameChange = (event) => {
@@ -118,7 +121,7 @@ const Numbers = ({people, onClick}) => {
   return (
     <div>
       {people.map(person => 
-        <Number key={person.id} name={person.name} number={person.number} id={person.id} onClick={() => onClick(person.id)}/>)
+        <Number key={person.id} name={person.name} number={person.number} id={person.id} onClick={() => onClick(person.name, person.id)}/>)
       }
     </div>
   )
