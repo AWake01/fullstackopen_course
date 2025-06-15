@@ -1,5 +1,6 @@
 import { useState, useEffect} from 'react'
 import axios from 'axios'
+import personsService from './services/persons'
 
 const App = () => {
   // const [persons, setPersons] = useState([
@@ -14,13 +15,13 @@ const App = () => {
   const [searchValue, setSearchValue] = useState('')
   const [showAll, setShowAll] = useState(true)
 
-  const initalDataHook = () => {
-    axios.get('http://localhost:3001/persons')
-    .then(response => {
-      setPersons(response.data)
-    })
-  }
-  useEffect(initalDataHook, [])
+  useEffect(() => {
+    personsService
+      .getAll()
+      .then(response => {
+        setPersons(response.data)
+      })
+  }, [])
 
   const addClick = (event) => {
     event.preventDefault()
@@ -34,8 +35,8 @@ const App = () => {
       //alert(`added ${newName} ${newNumber} to phonebook`)
       //setPersons(persons.concat(newPerson))
 
-      axios
-        .post('http://localhost:3001/persons', newPerson)
+      personsService
+        .create(newPerson)
         .then(response => {
           console.log(response.data)
           setPersons(persons.concat(response.data))
