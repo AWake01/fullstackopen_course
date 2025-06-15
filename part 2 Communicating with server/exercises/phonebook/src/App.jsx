@@ -27,14 +27,20 @@ const App = () => {
     event.preventDefault()
     console.log(newName)
     const newPerson = { name : newName , number : newNumber}
+    const foundPerson= persons.find(person => person.name === newPerson.name)
+    const updatedPerson= { ...foundPerson, number: newPerson.number}
 
-    if(persons.find(person => person.name === newPerson.name)) { 
-      alert(`${newName} is already added to phonebook`)
+    if(foundPerson) { 
+      if(confirm(`${foundPerson.name} is already added to phonebook, replace the old number with a new one?`)) {
+        personsService
+          .updatePerson(foundPerson.id, newPerson)
+          .then(personToUpdate => {
+            setPersons(persons.map(person => person.id === foundPerson.id ? personToUpdate : person))
+
+        })
+      }
     }
     else{ 
-      //alert(`added ${newName} ${newNumber} to phonebook`)
-      //setPersons(persons.concat(newPerson))
-
       personsService
         .createPerson(newPerson)
         .then(personToAdd => {
