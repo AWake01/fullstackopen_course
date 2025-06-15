@@ -5,8 +5,12 @@ const getAll = () => {
   return axios.get(baseUrl)
 }
 
-const create = newObject => {
+const createPerson = newObject => {
   return axios.post(baseUrl, newObject)
 }
 
-export default { getAll, create } 
+const deletePerson = (id) => {
+  return axios.delete(`${baseUrl}/${id}`)
+}
+
+export default { getAll, createPerson, deletePerson } 

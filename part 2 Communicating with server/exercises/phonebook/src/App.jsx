@@ -36,7 +36,7 @@ const App = () => {
       //setPersons(persons.concat(newPerson))
 
       personsService
-        .create(newPerson)
+        .createPerson(newPerson)
         .then(response => {
           console.log(response.data)
           setPersons(persons.concat(response.data))
@@ -44,6 +44,16 @@ const App = () => {
 
       setSearchValue('')
     }
+  }
+
+  const deleteClick = (id) => {
+    console.log('delete ', id)
+     personsService
+        .deletePerson(id)
+        .then(response => {
+          console.log(response.data)
+          setPersons(persons.filter((person) => person.id !== id))
+        })
   }
 
   const handleNameChange = (event) => {
@@ -79,14 +89,8 @@ const App = () => {
       <h2>Add a new</h2>
       <PersonForm onClick={addClick} handleName={handleNameChange} handleNumber={handleNumberChange}></PersonForm>
       <h2>Numbers</h2>
-      <Numbers people={filterPersons}></Numbers>
+      <Numbers people={filterPersons} onClick={deleteClick}></Numbers>
     </div>
-  )
-}
-
-const Number = ({name, number}) => {
-  return( 
-    <p>{name} {number}</p>
   )
 }
 
@@ -110,11 +114,22 @@ const PersonForm = ({onClick, handleName, handleNumber}) => {
   )
 }
 
-const Numbers = ({people}) => {
+const Numbers = ({people, onClick}) => {
   return (
-    <div>{people.map(person => <Number key={person.name} name={person.name} number={person.number}/>)} </div>
+    <div>
+      {people.map(person => 
+        <Number key={person.id} name={person.name} number={person.number} id={person.id} onClick={() => onClick(person.id)}/>)
+      }
+    </div>
   )
 }
 
+const Number = ({name, number, onClick}) => {
+  return(
+    <div>
+      <p>{name} {number} <button onClick={onClick}>Delete</button></p>
+    </div>
+  )
+}
 
 export default App
