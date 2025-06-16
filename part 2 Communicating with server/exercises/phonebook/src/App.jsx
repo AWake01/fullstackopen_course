@@ -14,7 +14,8 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [searchValue, setSearchValue] = useState('')
   const [showAll, setShowAll] = useState(true)
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [message, setMessage] = useState(null)
+  const [messageType, setMessageType] = useState(null)
 
   useEffect(() => {
     personsService
@@ -37,8 +38,10 @@ const App = () => {
           .updatePerson(foundPerson.id, newPerson)
           .then(personToUpdate => {
             setPersons(persons.map(person => person.id === foundPerson.id ? personToUpdate : person))
-            showErrorMessage(`Changed ${personToUpdate.name} number to ${personToUpdate.number}`)
-        })
+            showMessage(`Changed ${personToUpdate.name} number to ${personToUpdate.number}`, 'success')})
+          .catch(error => {
+            showMessage(`Information of ${foundPerson.name} has already been removed from the server,`, 'error')
+          })
       }
     }
     else{ 
@@ -47,7 +50,7 @@ const App = () => {
         .then(personToAdd => {
           console.log(personToAdd)
           setPersons(persons.concat(personToAdd))
-          showErrorMessage(`Added ${personToAdd.name}`)
+          showMessage(`Added ${personToAdd.name}`, 'success')
         })
 
       setSearchValue('')
@@ -63,7 +66,7 @@ const App = () => {
           .then(personToDelete => {
             console.log(personToDelete)
             setPersons(persons.filter((person) => person.id !== id))
-            showErrorMessage(`Deleted ${personToDelete.name}`)
+            showMessage(`Deleted ${personToDelete.name}`, 'success')
           })
     }
   }
@@ -94,16 +97,19 @@ const App = () => {
   ? persons
   : persons.filter(person => person.name.toLowerCase().includes(searchValue.toLowerCase()))  //Case insensitive
 
-  const showErrorMessage = (message) =>
-    setErrorMessage(message)
+  const showMessage = (message, type) => {
+    setMessageType(type)
+    setMessage(message)
     setTimeout(() => {
-      setErrorMessage(null)
+      setMessageType(null)
+      setMessage(null)
     }, 5000)
+  }
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <Error message={errorMessage}></Error>
+      <Message message={message} type={messageType}></Message>
       <Filter onChange={handleSearchChange} value={searchValue}></Filter>
       <h2>Add a new</h2>
       <PersonForm onClick={addClick} handleName={handleNameChange} handleNumber={handleNumberChange}></PersonForm>
@@ -151,14 +157,22 @@ const Number = ({name, number, onClick}) => {
   )
 }
 
-const Error = ({message}) => {
+const Message = ({message, type}) => {
   if(message === null) {
     return null
   }
 
+  // const className = ''
+  // if(type === 'success') {
+  //       className = 'success'
+  // }
+  // else() {
+  //       className = 'error'
+  // }
+
   return(
-    <div className='error'>
-      {message}
+    <div className={type}>
+        {message}
     </div>
   )
 }
