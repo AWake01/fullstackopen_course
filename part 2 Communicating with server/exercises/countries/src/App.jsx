@@ -51,12 +51,18 @@ function App() {
       setCountriesList(null)
       setSelectedCountry(null)
     }
-}
+  }
+
+  const showClick = (event) => {
+    const country = countriesData.filter(country => 
+        country.name.common === event.target.id)
+    setSelectedCountry(country[0])  //Returned as a single element in and array otherwise
+  }
 
   return (
     <div>
       <Search onChange={searchChange} searchMessage={searchMessage}></Search>
-      <Countries countries={countriesList}></Countries>
+      <Countries countries={countriesList} onClick={showClick}></Countries>
       <CountryInfo info={selectedCountry}></CountryInfo>
     </div>
   )
@@ -81,19 +87,22 @@ const SearchMessage= ({message}) => {
   )
 }
 
-const Countries = ({countries}) => {
+const Countries = ({countries, onClick}) => {
   if(countries === null) { return }
 
   return(
     <div>
-      {countries.map(country => <CountryLine key={country.name.common} name={country.name.common}></CountryLine>)}
+      {countries.map(country => <CountryLine key={country.name.common} name={country.name.common} showClick={onClick}></CountryLine>)}
     </div>
   )
 }
 
-const CountryLine = ({name}) => {
+const CountryLine = ({name, showClick}) => {
   return(
-    <p>{name}</p>
+      <div className='countryLine-div'>
+        {name}
+        <button id={name} onClick={showClick}>Show</button>
+      </div>
   )
 }
 
@@ -113,7 +122,7 @@ const CountryInfo = ({info}) => {
 const CountryStats = ({info}) => {
   return(
     <div>
-        <table>
+        <table className='stat-table'>
           <tbody>
             <CountryStat label='Capital' value={info.capital}></CountryStat>
             <CountryStat label='Area' value={info.area}></CountryStat>
@@ -126,7 +135,7 @@ const CountryStats = ({info}) => {
 const CountryStat = ({label, value}) => {
   return(
         <tr>
-          <td>{label}</td>
+          <th>{label}</th>
           <td>{value}</td>
         </tr>
   )

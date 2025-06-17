@@ -3,10 +3,20 @@
   color: red
 }
 
-.stat-table{
-  
-}
-
 .flag-img{
   border: 1px solid grey
+}
+
+.countryLine-div{
+  display: flex;
+  width: fit-content;
+  gap: 10px;
+}
+
+.stat-table{
+  border-spacing: 10px;
+}
+
+th{
+  text-align: right;
 }
