@@ -2,6 +2,8 @@ import { useState, useEffect} from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './index.css'
+import countryService from './services/countries'
+import weatherService from './services/weather'
 import axios from 'axios'
 
 function App() {
@@ -10,14 +12,30 @@ function App() {
   const [selectedCountry, setSelectedCountry] = useState(null)
   const [searchValue, setSearchValue] = useState(null)
   const [searchMessage, setSearchMessage] = useState(null)
+  const [weatherData, setWeatherData] = useState(null)
+  const [weatherIcon, setWeatherIcon] = useState('')
 
+  //Inital country data retrieved
   useEffect(() => {
-    axios.get("https://studies.cs.helsinki.fi/restcountries/api/all")
+    countryService
+      .getCountries()
       .then(response => {
-        //console.log(response.data)
-        setCountriesData(response.data)
+        setCountriesData(response)  
       })
   }, [])
+
+  //Weather data retrieved when country is selected
+  useEffect(() => {
+    if(selectedCountry != null) {
+      console.log('CODE', selectedCountry.cca2)
+      weatherService
+        .getWeather(selectedCountry.capital, selectedCountry.cca2)
+        .then(response => {
+          setWeatherData(response)  
+          console.log('Weather', response)
+        })
+    }
+  }, [selectedCountry])
 
   //Show all countries with matching name part
   const searchChange = (event) => {
@@ -63,7 +81,7 @@ function App() {
     <div>
       <Search onChange={searchChange} searchMessage={searchMessage}></Search>
       <Countries countries={countriesList} onClick={showClick}></Countries>
-      <CountryInfo info={selectedCountry}></CountryInfo>
+      <CountryInfo info={selectedCountry} weatherData={weatherData} weatherIcon={weatherIcon}></CountryInfo>
     </div>
   )
 }
@@ -106,7 +124,7 @@ const CountryLine = ({name, showClick}) => {
   )
 }
 
-const CountryInfo = ({info}) => {
+const CountryInfo = ({info, weatherData, weatherIcon}) => {
    if(info === null) { return }
 
   return(
@@ -115,6 +133,7 @@ const CountryInfo = ({info}) => {
       <CountryStats info={info}></CountryStats>
       <Languages languages={info.languages}></Languages>
       <Flag flags={info.flags}></Flag>
+      <div className='weather-div'><Weather weatherData={weatherData} icon={weatherIcon}></Weather></div>
     </div>
   )
 }
@@ -161,6 +180,35 @@ const Flag = ({flags}) => {
     <div>
       <img className='flag-img' src={flags.png}></img>
     </div>
+  )
+}
+
+const Weather = ({weatherData, weatherIcon}) => {
+  if(weatherData != null) {
+    const iconCode = weatherData.weather[0].icon
+    const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@4x.png`
+
+    return(
+      <div>
+        <h2>Weather in {weatherData.name}</h2>
+        <WeatherStat label={'Temperature'} value={weatherData.main.temp} units='&#8451;'></WeatherStat>
+        <div className='weatherIcon-div'><img className='weatherIcon-img' src={iconUrl}/></div>
+        <WeatherStat label={'Speed'} value={weatherData.wind.speed} units='m/s'></WeatherStat>
+      </div>
+    )
+  }
+}
+
+const WeatherStat = ({label, value, units}) => {
+  return(
+    <table className='stat-table'>
+          <tbody>
+            <tr>
+              <th>{label}</th>
+              <td>{value} {units}</td>
+            </tr>
+      </tbody>
+    </table>
   )
 }
 
