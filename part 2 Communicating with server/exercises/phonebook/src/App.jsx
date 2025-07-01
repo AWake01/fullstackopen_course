@@ -14,6 +14,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [searchValue, setSearchValue] = useState('')
   const [showAll, setShowAll] = useState(true)
+  const [addPerson, setAddPerson] = useState(false)
   const [message, setMessage] = useState(null)
   const [messageType, setMessageType] = useState(null)
 
@@ -24,6 +25,15 @@ const App = () => {
         setPersons(initalPersons)
       })
   }, [])
+
+  // const getPersonsHook = () => {
+  //   personsService
+  //     .getAll()
+  //     .then(initalPersons => {
+  //       setPersons(initalPersons)
+  //     })
+  // }
+  // useEffect(getPersonsHook, [])
 
   const addClick = (event) => {
     event.preventDefault()
@@ -45,16 +55,22 @@ const App = () => {
       }
     }
     else{ 
+      let message = null
       personsService
         .createPerson(newPerson)
         .then(personToAdd => {
-          console.log(personToAdd)
-          setPersons(persons.concat(personToAdd))
+          //console.log('person', personToAdd)
+          //setPersons(persons.concat(personToAdd))
           showMessage(`Added ${personToAdd.name}`, 'success')
         })
-
-      setSearchValue('')
+        .catch((error) => {
+          showMessage(error.response.data.error, 'error')
+        })
     }
+
+    setSearchValue('')
+    setShowAll(true)
+    setAddPerson(true)
   }
 
   const deleteClick = (name, id) => {
@@ -97,6 +113,7 @@ const App = () => {
   ? persons
   : persons.filter(person => person.name.toLowerCase().includes(searchValue.toLowerCase()))  //Case insensitive
 
+  //type and message states passed to message component to set 'success' or 'error' message style
   const showMessage = (message, type) => {
     setMessageType(type)
     setMessage(message)
