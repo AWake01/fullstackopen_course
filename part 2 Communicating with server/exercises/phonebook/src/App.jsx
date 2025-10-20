@@ -60,7 +60,7 @@ const App = () => {
         .createPerson(newPerson)
         .then(personToAdd => {
           //console.log('person', personToAdd)
-          //setPersons(persons.concat(personToAdd))
+          setPersons(persons.concat(personToAdd))
           showMessage(`Added ${personToAdd.name}`, 'success')
         })
         .catch((error) => {
